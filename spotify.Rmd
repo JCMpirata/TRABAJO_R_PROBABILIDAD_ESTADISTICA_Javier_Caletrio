@@ -1,0 +1,185 @@
+---
+title: "Trabajo R Markdown - Probabilidad y Estadística"
+author: "Javier Caletrio Misas"
+date: "06/2023"
+output: html_document
+---
+
+# Importar las librerías necesarias
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(readxl)
+library(broom)
+library(knitr)
+```
+
+# Crear dataframe
+
+```{r}
+df <- read.csv2("spotify-streaming-top-50-spain.csv", sep = ",", dec = ".")
+
+# Mostrar datos
+head(df)
+```
+
+# Seleccionar las columnas que se van a utilizar
+
+```{r}
+df <- df %>% select(release_date, artist, song, popularity, duration_ms, album_type, total_tracks) %>% filter(!is.na(release_date))
+# Mostrar datos
+kable(head(df))
+```
+
+# Añadir una columna con el número de canción
+
+```{r}
+df <- df %>% mutate(n = row_number())
+# Mostrar datos
+kable(head(df))
+```
+
+# Añadir una columna con un numero random de followers entre 100000 y 1000000
+
+```{r}
+df <- df %>% mutate(followers = sample(100000:1000000, nrow(df), replace = TRUE))
+# Mostrar datos
+kable(head(df))
+```
+
+# Añadir una columna booleana que indique si esta en el top 10
+
+```{r}
+df <- df %>% mutate(top10 = ifelse(n <= 10, TRUE, FALSE))
+# Mostrar datos
+kable(head(df))
+```
+
+# Añadir una columna con el nombre de la canción en mayusculas
+
+```{r}
+df <- df %>% mutate(song_upper = toupper(song))
+# Mostrar datos
+kable(head(df))
+```
+
+# Generar nuevas columnas a partir de la recodificacion de otras columnas
+
+```{r}
+df <- df %>% mutate(range_popularity = case_when(popularity <= 25 ~ "Low",
+                                                 popularity > 25 & popularity <= 50 ~ "Medium",
+                                                 popularity > 50 & popularity <= 75 ~ "High",
+                                                 popularity > 75 ~ "Very High"))
+# Mostrar datos
+kable(head(df))
+```
+
+# Aplicar filtros para las filas que cumplan una condición
+
+```{r}
+df <- df %>% filter(range_popularity == "Very High")
+# Mostrar datos
+kable(head(df))
+```
+
+# Tabla de frecuencias simples artistas
+
+```{r}
+# Tabla de frecuencias simples
+
+# Frecuencias absolutas
+freq_abs <- table(df$artist)
+
+# Frecuencias relativas
+freq_rel <- prop.table(freq_abs)
+
+# Frecuencias absolutas acumuladas
+freq_abs_ac <- cumsum(freq_abs)
+
+# Frecuencias relativas acumuladas
+freq_rel_ac <- cumsum(freq_rel)
+
+# Crear dataframe con las frecuencias
+df_freq <- cbind(freq_abs, freq_rel, freq_abs_ac, freq_rel_ac)
+
+# Mostrar datos
+kable(head(df_freq))
+```
+
+# Tabla de frecuencias por grupos de datos con intervalos cerrados por la izquierda
+
+```{r}
+# Tabla de frecuencias por grupos de datos
+
+# Frecuencias absolutas. Creacion manual de 5 grupos con intervalos cerrados por la izquierda
+freq_abs <- table(cut(df$popularity, breaks = c(0, 25, 50, 75, 100)))
+
+# Frecuencias relativas
+freq_rel <- prop.table(freq_abs)
+
+# Frecuencias absolutas acumuladas
+freq_abs_ac <- cumsum(freq_abs)
+
+# Frecuencias relativas acumuladas
+freq_rel_ac <- cumsum(freq_rel)
+
+# Crear dataframe con las frecuencias
+df_freq <- cbind(freq_abs, freq_rel, freq_abs_ac, freq_rel_ac)
+
+# Mostrar datos
+kable(head(df_freq))
+```
+
+# Estadisticos descriptivos
+
+```{r}
+# Estadísticos basicos para variables cuantitativas
+estadisticos_variables_cuantitativas <- df %>% select(popularity, duration_ms, total_tracks) %>% 
+  summary(media = mean(popularity),
+            mediana = median(popularity),
+            varianza = var(popularity),
+            desviacion_tipica = sd(popularity),
+            minimo = min(popularity),
+            maximo = max(popularity),
+            rango = max(popularity) - min(popularity),
+            coeficiente_de_variacion = sd(popularity) / mean(popularity),
+            coeficiente_de_asimetria = skewness(popularity),
+            coeficiente_de_curtosis = kurtosis(popularity))
+kable(estadisticos_variables_cuantitativas)
+
+# Estadísticos basicos para variables cualitativas
+estadisticos_variables_cualitativas <- df %>% select(artist, album_type) %>% 
+  summary(media = mean(artist),
+            mediana = median(artist),
+            varianza = var(artist),
+            desviacion_tipica = sd(artist),
+            minimo = min(artist),
+            maximo = max(artist),
+            rango = max(artist) - min(artist),
+            coeficiente_de_variacion = sd(artist) / mean(artist),
+            coeficiente_de_asimetria = skewness(artist),
+            coeficiente_de_curtosis = kurtosis(artist))
+kable(estadisticos_variables_cualitativas)
+
+# Estadísticos basicos para variables cuantitativas, agrupados por variables cualitativas
+estadisticos_variables_cuantitativas_agrupados_cualitativas <- df %>% select(popularity, duration_ms, total_tracks, artist, album_type) %>% 
+  group_by(artist, album_type) %>% 
+  summary(media = mean(popularity),
+            mediana = median(popularity),
+            varianza = var(popularity),
+            desviacion_tipica = sd(popularity),
+            minimo = min(popularity),
+            maximo = max(popularity),
+            rango = max(popularity) - min(popularity),
+            coeficiente_de_variacion = sd(popularity) / mean(popularity),
+            coeficiente_de_asimetria = skewness(popularity),
+            coeficiente_de_curtosis = kurtosis(popularity))
+kable(estadisticos_variables_cuantitativas_agrupados_cualitativas)
+```
+
+
+
+
