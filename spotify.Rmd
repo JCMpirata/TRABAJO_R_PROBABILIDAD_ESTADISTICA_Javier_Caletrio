@@ -180,6 +180,248 @@ estadisticos_variables_cuantitativas_agrupados_cualitativas <- df %>% select(pop
 kable(estadisticos_variables_cuantitativas_agrupados_cualitativas)
 ```
 
+# Diagrama de barras
+
+```{r}
+# Diagrama de barras de la popularidad de las canciones
+barplot(table(df$popularity), main = "Popularidad de las canciones", xlab = "Popularidad", ylab = "Frecuencia", col = "blue")
+
+# Diagrama de barras de la popularidad de las canciones, agrupadas por artistas
+barplot(table(df$popularity, df$artist), main = "Popularidad de las canciones, agrupadas por artistas", xlab = "Popularidad", ylab = "Frecuencia", col = "red")
+
+# Diagrama de barras de la duracion de las canciones
+barplot(table(df$duration_ms), main = "Duracion de las canciones", xlab = "Duracion", ylab = "Frecuencia", col = "green")
+
+# Diagrama de barras de la duracion de las canciones, agrupadas por artistas
+barplot(table(df$duration_ms, df$artist), main = "Duracion de las canciones, agrupadas por artistas", xlab = "Duracion", ylab = "Frecuencia", col = "yellow")
+```
+
+# Diagrama de lineas con ggplot2
+
+```{r}
+# Dibujar poligono de frecuencias de la popularidad de las canciones
+ggplot(df, aes(x = popularity, y = n, group = 1)) + geom_line(colour = "blue") + labs(title = "Popularidad de las canciones", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar poligono de frecuencias de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = n, color = artist)) + geom_line() + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Popularidad", y = "Frecuencia", color = "Artista") + scale_color_discrete()
+
+# Dibujar poligono de frecuencias de la duracion de las canciones
+ggplot(df, aes(x = duration_ms, y = n, group = 1)) + geom_line(colour = "green") + labs(title = "Duracion de las canciones", x = "Duracion", y = "Frecuencia")
+
+# Dibujar poligono de frecuencias de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = n, color = artist)) + geom_line() + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia", color = "Artista") + scale_color_discrete()
+```
+
+# Dibujar histogramas con ggplot2
+
+```{r}
+# Dibujar histograma de la popularidad de las canciones
+ggplot(df, aes(x = popularity)) + geom_histogram(binwidth = 25, fill = "blue", colour = "black") + labs(title = "Popularidad de las canciones", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar histograma de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, fill = artist, colour = artist)) + geom_histogram(binwidth = 25) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar histograma de la duracion de las canciones
+ggplot(df, aes(x = duration_ms)) + geom_histogram(binwidth = 10000, fill = "green", colour = "black") + labs(title = "Duracion de las canciones", x = "Duracion", y = "Frecuencia")
+
+# Dibujar histograma de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, fill = artist, colour = artist)) + geom_histogram(binwidth = 10000) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia")
+```
+
+# Dibujar poligonos de frecuencias con ggplot2
+
+```{r}
+# Dibujar poligono de frecuencias de la popularidad de las canciones
+ggplot(df, aes(x = popularity)) + geom_freqpoly(binwidth = 1, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar poligono de frecuencias de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, fill = artist, colour = artist)) + geom_freqpoly(binwidth = 1) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar poligono de frecuencias de la duracion de las canciones
+ggplot(df, aes(x = duration_ms)) + geom_freqpoly(binwidth = 10000, colour = "green") + labs(title = "Duracion de las canciones", x = "Duracion", y = "Frecuencia")
+
+# Dibujar poligono de frecuencias de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, fill = artist, colour = artist)) + geom_freqpoly(binwidth = 10000) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia")
+```
+
+# Dibujar diagramas de cajas con ggplot2
+
+```{r}
+# Dibujar diagrama de cajas de la popularidad de las canciones
+ggplot(df, aes(x = "", y = popularity)) + geom_boxplot(fill = "blue") + labs(title = "Popularidad de las canciones", x = "Popularidad", y = "Frecuencia")
+
+# Dibujar diagrama de cajas de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = artist, y = popularity, fill = artist, colour = artist)) + geom_boxplot() + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Artista", y = "Popularidad")
+
+# Dibujar diagrama de cajas de la duracion de las canciones
+ggplot(df, aes(x = "", y = duration_ms)) + geom_boxplot(fill = "green") + labs(title = "Duracion de las canciones", x = "Duracion", y = "Frecuencia")
+
+# Dibujar diagrama de cajas de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = artist, y = duration_ms, fill = artist, colour = artist)) + geom_boxplot() + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Artista", y = "Duracion")
+```
+
+# Modelos de regresion lineal
+
+```{r}
+# Modelo de regresion lineal de la popularidad de las canciones
+modelo1 <- lm(popularity ~ duration_ms, data = df)
+summary(modelo1)
+# Visualizar el modelo de regresion lineal de la popularidad de las canciones
+ggplot(df, aes(x = duration_ms, y = popularity)) + geom_point() + geom_smooth(method = "lm", se = FALSE, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Duracion", y = "Popularidad")
+
+# Modelo de regresion lineal de la popularidad de las canciones, agrupadas por artistas
+modelo2 <- lm(popularity ~ duration_ms + artist, data = df)
+summary(modelo2)
+# Visualizar el modelo de regresion lineal de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = popularity, colour = artist)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Duracion", y = "Popularidad", colour = "Artista")
+
+# Modelo de regresion lineal de la duracion de las canciones
+modelo3 <- lm(duration_ms ~ popularity, data = df)
+summary(modelo3)
+# Visualizar el modelo de regresion lineal de la duracion de las canciones
+ggplot(df, aes(x = popularity, y = duration_ms)) + geom_point() + geom_smooth(method = "lm", se = FALSE, colour = "green") + labs(title = "Duracion de las canciones", x = "Popularidad", y = "Duracion")
+
+# Modelo de regresion lineal de la duracion de las canciones, agrupadas por artistas
+modelo4 <- lm(duration_ms ~ popularity + artist, data = df)
+summary(modelo4)
+# Visualizar el modelo de regresion lineal de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
+```
+
+# Modelos de regresion no lineal
+
+## Modelo de regresion polinomial
+```{r}
+# Modelo de regresion polinomial de la popularidad de las canciones
+modelo5 <- lm(popularity ~ poly(duration_ms, 2), data = df)
+summary(modelo5)
+# Visualizar el modelo de regresion polinomial de la popularidad de las canciones
+ggplot(df, aes(x = duration_ms, y = popularity)) + geom_point() + geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Duracion", y = "Popularidad")
+
+# Modelo de regresion polinomial de la popularidad de las canciones, agrupadas por artistas
+modelo6 <- lm(popularity ~ poly(duration_ms, 2) + artist, data = df)
+summary(modelo6)
+# Visualizar el modelo de regresion polinomial de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = popularity, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Duracion", y = "Popularidad", colour = "Artista")
+
+# Modelo de regresion polinomial de la duracion de las canciones
+modelo7 <- lm(duration_ms ~ poly(popularity, 2), data = df)
+summary(modelo7)
+# Visualizar el modelo de regresion polinomial de la duracion de las canciones
+ggplot(df, aes(x = popularity, y = duration_ms)) + geom_point() + geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, colour = "green") + labs(title = "Duracion de las canciones", x = "Popularidad", y = "Duracion")
+
+# Modelo de regresion polinomial de la duracion de las canciones, agrupadas por artistas
+modelo8 <- lm(duration_ms ~ poly(popularity, 2) + artist, data = df)
+summary(modelo8)
+# Visualizar el modelo de regresion polinomial de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
+```
+
+# Modelo de regresion exponencial
+
+```{r}
+# Modelo de regresion exponencial de la popularidad de las canciones
+modelo9 <- lm(log(popularity) ~ duration_ms, data = df)
+summary(modelo9)
+# Visualizar el modelo de regresion exponencial de la popularidad de las canciones
+ggplot(df, aes(x = duration_ms, y = popularity)) + geom_point() + geom_smooth(method = "lm", formula = y ~ exp(x), se = FALSE, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Duracion", y = "Popularidad")
+
+# Modelo de regresion exponencial de la popularidad de las canciones, agrupadas por artistas
+modelo10 <- lm(log(popularity) ~ duration_ms + artist, data = df)
+summary(modelo10)
+# Visualizar el modelo de regresion exponencial de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = popularity, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ exp(x), se = FALSE) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Duracion", y = "Popularidad", colour = "Artista")
+
+# Modelo de regresion exponencial de la duracion de las canciones
+modelo11 <- lm(log(duration_ms) ~ popularity, data = df)
+summary(modelo11)
+# Visualizar el modelo de regresion exponencial de la duracion de las canciones
+ggplot(df, aes(x = popularity, y = duration_ms)) + geom_point() + geom_smooth(method = "lm", formula = y ~ exp(x), se = FALSE, colour = "green") + labs(title = "Duracion de las canciones", x = "Popularidad", y = "Duracion")
+
+# Modelo de regresion exponencial de la duracion de las canciones, agrupadas por artistas
+modelo12 <- lm(log(duration_ms) ~ popularity + artist, data = df)
+summary(modelo12)
+# Visualizar el modelo de regresion exponencial de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ exp(x), se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
+```
+
+# Modelo de regresion logaritmica
+
+```{r}
+# Modelo de regresion logaritmica de la popularidad de las canciones
+modelo13 <- lm(log(popularity) ~ duration_ms, data = df)
+summary(modelo13)
+# Visualizar el modelo de regresion logaritmica de la popularidad de las canciones
+ggplot(df, aes(x = duration_ms, y = popularity)) + geom_point() + geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Duracion", y = "Popularidad")
+
+# Modelo de regresion logaritmica de la popularidad de las canciones, agrupadas por artistas
+modelo14 <- lm(log(popularity) ~ duration_ms + artist, data = df)
+summary(modelo14)
+# Visualizar el modelo de regresion logaritmica de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = popularity, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Duracion", y = "Popularidad", colour = "Artista")
+
+# Modelo de regresion logaritmica de la duracion de las canciones
+modelo15 <- lm(log(duration_ms) ~ popularity, data = df)
+summary(modelo15)
+# Visualizar el modelo de regresion logaritmica de la duracion de las canciones
+ggplot(df, aes(x = popularity, y = duration_ms)) + geom_point() + geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE, colour = "green") + labs(title = "Duracion de las canciones", x = "Popularidad", y = "Duracion")
+
+# Modelo de regresion logaritmica de la duracion de las canciones, agrupadas por artistas
+modelo16 <- lm(log(duration_ms) ~ popularity + artist, data = df)
+summary(modelo16)
+# Visualizar el modelo de regresion logaritmica de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ log(x), se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
+```
+
+# Modelo de regresion potencial
+
+```{r}
+# Modelo de regresion potencial de la popularidad de las canciones
+modelo17 <- lm(log(popularity) ~ duration_ms, data = df)
+summary(modelo17)
+# Visualizar el modelo de regresion potencial de la popularidad de las canciones
+ggplot(df, aes(x = duration_ms, y = popularity)) + geom_point() + geom_smooth(method = "lm", formula = y ~ x^2, se = FALSE, colour = "blue") + labs(title = "Popularidad de las canciones", x = "Duracion", y = "Popularidad")
+
+# Modelo de regresion potencial de la popularidad de las canciones, agrupadas por artistas
+modelo18 <- lm(log(popularity) ~ duration_ms + artist, data = df)
+summary(modelo18)
+# Visualizar el modelo de regresion potencial de la popularidad de las canciones, agrupadas por artistas
+ggplot(df, aes(x = duration_ms, y = popularity, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ x^2, se = FALSE) + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Duracion", y = "Popularidad", colour = "Artista")
+
+# Modelo de regresion potencial de la duracion de las canciones
+modelo19 <- lm(log(duration_ms) ~ popularity, data = df)
+summary(modelo19)
+# Visualizar el modelo de regresion potencial de la duracion de las canciones
+ggplot(df, aes(x = popularity, y = duration_ms)) + geom_point() + geom_smooth(method = "lm", formula = y ~ x^2, se = FALSE, colour = "green") + labs(title = "Duracion de las canciones", x = "Popularidad", y = "Duracion")
+
+# Modelo de regresion potencial de la duracion de las canciones, agrupadas por artistas
+modelo20 <- lm(log(duration_ms) ~ popularity + artist, data = df)
+summary(modelo20)
+# Visualizar el modelo de regresion potencial de la duracion de las canciones, agrupadas por artistas
+ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ x^2, se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
+```
+
+# Comparar los modelos de regresion
+
+```{r}
+# Comparar todos los modelos de regresion
+comparar_modelos_regresion <- anova(modelo1, modelo2, modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo11, modelo12, modelo13, modelo14, modelo15, modelo16, modelo17, modelo18, modelo19, modelo20)
+summary(comparar_modelos_regresion)
+```
+
+# Predicciones de los modelos de regresion
+
+```{r}
+# Predicciones de la popularidad de los artistas
+predicciones_popularidad_cantantes <- predict(modelo1, newdata = df)
+print(predicciones_popularidad_cantantes)
+
+# Predicciones de la popularidad de las canciones
+predicciones_popularidad_canciones <- predict(modelo3, newdata = df)
+print(predicciones_popularidad_canciones)
+```
+
+
 
 
 
