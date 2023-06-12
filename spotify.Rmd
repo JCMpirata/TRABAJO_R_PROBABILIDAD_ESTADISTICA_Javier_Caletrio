@@ -421,6 +421,120 @@ predicciones_popularidad_canciones <- predict(modelo3, newdata = df)
 print(predicciones_popularidad_canciones)
 ```
 
+# Pivotar el dataframe
+
+```{r}
+# Pivotar el dataframe de formato ancho a formato largo
+df_long <- df %>% pivot_longer(cols = c(popularity, followers), names_to = "variable", values_to = "value")
+head(df_long)
+
+# Pivotar el dataframe de formato largo a formato ancho
+df_wide <- df %>% pivot_wider(names_from = range_popularity, values_from = popularity)
+head(df_wide)
+```
+
+# Diagrama de barras agrupando con facetas
+
+```{r}
+# Diagrama de barras agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
+ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_bar(stat = "identity") + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
+```
+
+# Diagrama de barras agrupando con facetas y ordenando
+
+```{r}
+# Diagrama de barras agrupando con facetas y ordenando la popularidad de los artistas y la popularidad de las canciones
+ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_bar(stat = "identity") + facet_wrap(~ range_popularity, scales = "free_x") + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable") + scale_x_discrete(limits = c("range_popularity", "popularity", "followers"))
+```
+
+# Histograma agrupando con facetas
+
+```{r}
+# Histograma agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
+ggplot(df_long, aes(x = value, fill = variable)) + geom_histogram() + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
+```
+
+# Diagrama de cajas agrupando con facetas
+
+```{r}
+# Diagrama de cajas agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
+ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_boxplot() + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
+```
+
+# Diagrama de cajas agrupando con facetas y ordenando
+
+```{r}
+# Diagrama de cajas agrupando con facetas y ordenando la popularidad de los artistas y la popularidad de las canciones
+ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_boxplot() + facet_wrap(~ range_popularity, scales = "free_x") + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable") + scale_x_discrete(limits = c("range_popularity", "popularity", "followers"))
+```
+
+# Comparar la distribucion observada de una variable cuantitativa discreta con sus distribuciones teoricas apartir de sus percentiles
+
+```{r}
+# Comparar la distribucion observada de la popularidad de los artistas con sus distribuciones teoricas apartir de sus percentiles
+qqnorm(df$popularity, main = "Popularidad de los artistas", xlab = "Percentiles teoricos", ylab = "Percentiles observados")
+qqline(df$popularity, col = "red")
+
+# Comparar la distribucion observada de la duracion de las canciones con sus distribuciones teoricas apartir de sus percentiles
+qqnorm(df$duration_ms, main = "Duracion de las canciones", xlab = "Percentiles teoricos", ylab = "Percentiles observados")
+qqline(df$duration_ms, col = "green")
+```
+
+# Programar una funcion para calcular el coeficiente de correlacion de Pearson
+
+```{r}
+# Programar una funcion para calcular el coeficiente de correlacion de Pearson
+coeficiente_correlacion_pearson <- function(x, y) {
+  n <- length(x)
+  numerador <- n * sum(x * y) - sum(x) * sum(y)
+  denominador <- sqrt((n * sum(x^2) - sum(x)^2) * (n * sum(y^2) - sum(y)^2))
+  r <- numerador / denominador
+  return(r)
+}
+
+# Calcular el coeficiente de correlacion de Pearson entre la popularidad de los artistas y la popularidad de las canciones
+coeficiente_correlacion_pearson(df$popularity, df$followers)
+```
+
+# Programar una funcion para calcular el coeficiente de correlacion de Spearman
+
+```{r}
+# Programar una funcion para calcular el coeficiente de correlacion de Spearman
+coeficiente_correlacion_spearman <- function(x, y) {
+  n <- length(x)
+  numerador <- sum((rank(x) - rank(y))^2)
+  denominador <- n * (n^2 - 1)
+  r <- 1 - (6 * numerador / denominador)
+  return(r)
+}
+
+# Calcular el coeficiente de correlacion de Spearman entre la popularidad de los artistas y la popularidad de las canciones
+coeficiente_correlacion_spearman(df$popularity, df$followers)
+```
+
+# Simular un experimento aleatorio mediante la generacion de numeros aleatorios a partir de una distribucion discreta o continua y describir la variable resultante
+
+```{r}
+# Realizar experimento aleatorio mediante la generacion de numeros aleatorios a partir de una distribucion discreta de los lanzamientos de un dado
+experimento_aleatorio_dado <- sample(1:6, size = 100, replace = TRUE, prob = c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6))
+print(experimento_aleatorio_dado)
+
+# Diagrama de barras de la distribucion de los lanzamientos de un dado
+ggplot(data.frame(experimento_aleatorio_dado), aes(x = experimento_aleatorio_dado)) + geom_bar() + labs(title = "Distribucion de los lanzamientos de un dado", x = "Lanzamientos", y = "Cantidad", fill = "red", color = "red")
+
+# Realizar experimento aleatorio mediante la generacion de numeros aleatorios a partir de una distribucion continua de los lanzamientos de una moneda
+experimento_aleatorio_moneda <- sample(c("cara", "sello"), size = 100, replace = TRUE, prob = c(0.5, 0.5))
+eleccion <- runif(100, min = 0, max = 1)
+experimento_aleatorio_moneda[eleccion < 0.5] <- "cara"
+experimento_aleatorio_moneda[eleccion >= 0.5] <- "sello"
+print(experimento_aleatorio_moneda)
+print(eleccion)
+
+# Diagrama de barras de la distribucion de los lanzamientos de una moneda
+ggplot(data.frame(experimento_aleatorio_moneda), aes(x = experimento_aleatorio_moneda)) + geom_bar() + labs(title = "Distribucion de los lanzamientos de una moneda", x = "Lanzamientos", y = "Cantidad", fill = "yellow", color = "yellow")
+```
+
+
 
 
 
