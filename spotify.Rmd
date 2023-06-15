@@ -17,7 +17,7 @@ library(broom)
 library(knitr)
 ```
 
-# Crear dataframe
+# Crear un DataFrame a partir de un fichero csv o excel con el índice, separador de campos y separador de decimales adecuados.
 
 ```{r}
 df <- read.csv2("spotify-streaming-top-50-spain.csv", sep = ",", dec = ".")
@@ -26,7 +26,7 @@ df <- read.csv2("spotify-streaming-top-50-spain.csv", sep = ",", dec = ".")
 head(df)
 ```
 
-# Seleccionar las columnas que se van a utilizar
+# Prepocesar el fichero para selecccionar las columnas necesarias y eliminar las filas con valores desconocidos.
 
 ```{r}
 df <- df %>% select(release_date, artist, song, popularity, duration_ms, album_type, total_tracks) %>% filter(!is.na(release_date))
@@ -34,39 +34,31 @@ df <- df %>% select(release_date, artist, song, popularity, duration_ms, album_t
 kable(head(df))
 ```
 
-# Añadir una columna con el número de canción
+# Generar nuevas columnas a partir de la aplicación de fórmulas a las columnas existentes.
 
 ```{r}
+#Añadir una columna con el número de canción
 df <- df %>% mutate(n = row_number())
 # Mostrar datos
 kable(head(df))
-```
 
 # Añadir una columna con un numero random de followers entre 100000 y 1000000
-
-```{r}
 df <- df %>% mutate(followers = sample(100000:1000000, nrow(df), replace = TRUE))
 # Mostrar datos
 kable(head(df))
-```
 
 # Añadir una columna booleana que indique si esta en el top 10
-
-```{r}
 df <- df %>% mutate(top10 = ifelse(n <= 10, TRUE, FALSE))
 # Mostrar datos
 kable(head(df))
-```
 
 # Añadir una columna con el nombre de la canción en mayusculas
-
-```{r}
 df <- df %>% mutate(song_upper = toupper(song))
 # Mostrar datos
 kable(head(df))
 ```
 
-# Generar nuevas columnas a partir de la recodificacion de otras columnas
+# Generar nuevas columnas a partir de la recodificación de otras columnas
 
 ```{r}
 df <- df %>% mutate(range_popularity = case_when(popularity <= 25 ~ "Low",
@@ -77,7 +69,7 @@ df <- df %>% mutate(range_popularity = case_when(popularity <= 25 ~ "Low",
 kable(head(df))
 ```
 
-# Aplicar filtros para las filas que cumplan una condición
+# Aplicar filtros para las filas que cumplan una condición.
 
 ```{r}
 df <- df %>% filter(range_popularity == "Very High")
@@ -85,7 +77,7 @@ df <- df %>% filter(range_popularity == "Very High")
 kable(head(df))
 ```
 
-# Tabla de frecuencias simples artistas
+# Calcular tablas de frecuencias simples y agrupadas según una o varias variables cualitativas.
 
 ```{r}
 # Tabla de frecuencias simples
@@ -109,8 +101,6 @@ df_freq <- cbind(freq_abs, freq_rel, freq_abs_ac, freq_rel_ac)
 kable(head(df_freq))
 ```
 
-# Tabla de frecuencias por grupos de datos con intervalos cerrados por la izquierda
-
 ```{r}
 # Tabla de frecuencias por grupos de datos
 
@@ -133,7 +123,7 @@ df_freq <- cbind(freq_abs, freq_rel, freq_abs_ac, freq_rel_ac)
 kable(head(df_freq))
 ```
 
-# Estadisticos descriptivos
+# Calcular los principales estadísticos de las variables culitativas y cuantitativas, simples y agrupando según una o varias variables cualitativas, e interpretarlos.
 
 ```{r}
 # Estadísticos basicos para variables cuantitativas
@@ -178,10 +168,26 @@ estadisticos_variables_cuantitativas_agrupados_cualitativas <- df %>% select(pop
             coeficiente_de_asimetria = skewness(popularity),
             coeficiente_de_curtosis = kurtosis(popularity))
 kable(estadisticos_variables_cuantitativas_agrupados_cualitativas)
+
+# Estadísticos basicos para variables cualitativas, agrupados por variables cualitativas
+estadisticos_variables_cualitativas_agrupados_cualitativas <- df %>% select(artist, album_type) %>% 
+  group_by(artist, album_type) %>% 
+  summary(media = mean(artist),
+            mediana = median(artist),
+            varianza = var(artist),
+            desviacion_tipica = sd(artist),
+            minimo = min(artist),
+            maximo = max(artist),
+            rango = max(artist) - min(artist),
+            coeficiente_de_variacion = sd(artist) / mean(artist),
+            coeficiente_de_asimetria = skewness(artist),
+            coeficiente_de_curtosis = kurtosis(artist))
+kable(estadisticos_variables_cualitativas_agrupados_cualitativas)
 ```
 
-# Diagrama de barras
+# Realizar diagramas de barras o líneas simples y agrupando según una variables cualitativa e interpretarlos.
 
+# Diagramas de barras
 ```{r}
 # Diagrama de barras de la popularidad de las canciones
 barplot(table(df$popularity), main = "Popularidad de las canciones", xlab = "Popularidad", ylab = "Frecuencia", col = "blue")
@@ -196,23 +202,23 @@ barplot(table(df$duration_ms), main = "Duracion de las canciones", xlab = "Durac
 barplot(table(df$duration_ms, df$artist), main = "Duracion de las canciones, agrupadas por artistas", xlab = "Duracion", ylab = "Frecuencia", col = "yellow")
 ```
 
-# Diagrama de lineas con ggplot2
+# Diagrama de lineas
 
 ```{r}
-# Dibujar poligono de frecuencias de la popularidad de las canciones
+# Dibujar diagrama de lineas de la popularidad de las canciones
 ggplot(df, aes(x = popularity, y = n, group = 1)) + geom_line(colour = "blue") + labs(title = "Popularidad de las canciones", x = "Popularidad", y = "Frecuencia")
 
-# Dibujar poligono de frecuencias de la popularidad de las canciones, agrupadas por artistas
+# Dibujar diagrama de lineas de la popularidad de las canciones, agrupadas por artistas
 ggplot(df, aes(x = popularity, y = n, color = artist)) + geom_line() + labs(title = "Popularidad de las canciones, agrupadas por artistas", x = "Popularidad", y = "Frecuencia", color = "Artista") + scale_color_discrete()
 
-# Dibujar poligono de frecuencias de la duracion de las canciones
+# Dibujar diagrama de lineas de la duracion de las canciones
 ggplot(df, aes(x = duration_ms, y = n, group = 1)) + geom_line(colour = "green") + labs(title = "Duracion de las canciones", x = "Duracion", y = "Frecuencia")
 
-# Dibujar poligono de frecuencias de la duracion de las canciones, agrupadas por artistas
+# Dibujar dibujar diagrama de lineas de la duracion de las canciones, agrupadas por artistas
 ggplot(df, aes(x = duration_ms, y = n, color = artist)) + geom_line() + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia", color = "Artista") + scale_color_discrete()
 ```
 
-# Dibujar histogramas con ggplot2
+# Realizar historgramas e interpretarlos.
 
 ```{r}
 # Dibujar histograma de la popularidad de las canciones
@@ -228,7 +234,7 @@ ggplot(df, aes(x = duration_ms)) + geom_histogram(binwidth = 10000, fill = "gree
 ggplot(df, aes(x = duration_ms, fill = artist, colour = artist)) + geom_histogram(binwidth = 10000) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia")
 ```
 
-# Dibujar poligonos de frecuencias con ggplot2
+# Dibujar poligonos de frecuencias simples y agrupando según una variables cualitativa e interpretarlos.
 
 ```{r}
 # Dibujar poligono de frecuencias de la popularidad de las canciones
@@ -244,7 +250,7 @@ ggplot(df, aes(x = duration_ms)) + geom_freqpoly(binwidth = 10000, colour = "gre
 ggplot(df, aes(x = duration_ms, fill = artist, colour = artist)) + geom_freqpoly(binwidth = 10000) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Duracion", y = "Frecuencia")
 ```
 
-# Dibujar diagramas de cajas con ggplot2
+# Realizar diagramas de cajas simples y agrupando según una variable cualitativa e interpretarlos.
 
 ```{r}
 # Dibujar diagrama de cajas de la popularidad de las canciones
@@ -260,7 +266,7 @@ ggplot(df, aes(x = "", y = duration_ms)) + geom_boxplot(fill = "green") + labs(t
 ggplot(df, aes(x = artist, y = duration_ms, fill = artist, colour = artist)) + geom_boxplot() + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Artista", y = "Duracion")
 ```
 
-# Modelos de regresion lineal
+# Consturir modelos de regresión lineal simples y agrupando según una o varias variables cualitativas, e interpretarlos.
 
 ```{r}
 # Modelo de regresion lineal de la popularidad de las canciones
@@ -288,7 +294,7 @@ summary(modelo4)
 ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
 ```
 
-# Modelos de regresion no lineal
+# Consturir modelos de regresión no lineales simples y agrupando según una o varias variables cualitativas, e interpretarlos.
 
 ## Modelo de regresion polinomial
 ```{r}
@@ -401,7 +407,7 @@ summary(modelo20)
 ggplot(df, aes(x = popularity, y = duration_ms, colour = artist)) + geom_point() + geom_smooth(method = "lm", formula = y ~ x^2, se = FALSE) + labs(title = "Duracion de las canciones, agrupadas por artistas", x = "Popularidad", y = "Duracion", colour = "Artista")
 ```
 
-# Comparar los modelos de regresion
+# Comparar distintos modelos de regresion.
 
 ```{r}
 # Comparar todos los modelos de regresion
@@ -409,7 +415,7 @@ comparar_modelos_regresion <- anova(modelo1, modelo2, modelo3, modelo4, modelo5,
 summary(comparar_modelos_regresion)
 ```
 
-# Predicciones de los modelos de regresion
+# Hacer predicciones con los modelos de regresion.
 
 ```{r}
 # Predicciones de la popularidad de los artistas
@@ -421,7 +427,9 @@ predicciones_popularidad_canciones <- predict(modelo3, newdata = df)
 print(predicciones_popularidad_canciones)
 ```
 
-# Pivotar el dataframe
+# REQUISITOS EXTRA
+
+# Pivotar el DataFrame de formato ancho a formato largo y viceversa.
 
 ```{r}
 # Pivotar el dataframe de formato ancho a formato largo
@@ -433,56 +441,74 @@ df_wide <- df %>% pivot_wider(names_from = range_popularity, values_from = popul
 head(df_wide)
 ```
 
-# Diagrama de barras agrupando con facetas
+# Realizar diagramas agrupados con facetas.
+
+# Diagrama de barras agrupando con facetas.
 
 ```{r}
 # Diagrama de barras agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
 ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_bar(stat = "identity") + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
 ```
 
-# Diagrama de barras agrupando con facetas y ordenando
+# Diagrama de barras agrupando con facetas y ordenando.
 
 ```{r}
 # Diagrama de barras agrupando con facetas y ordenando la popularidad de los artistas y la popularidad de las canciones
 ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_bar(stat = "identity") + facet_wrap(~ range_popularity, scales = "free_x") + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable") + scale_x_discrete(limits = c("range_popularity", "popularity", "followers"))
 ```
 
-# Histograma agrupando con facetas
+# Histograma agrupando con facetas.
 
 ```{r}
 # Histograma agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
 ggplot(df_long, aes(x = value, fill = variable)) + geom_histogram() + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
 ```
 
-# Diagrama de cajas agrupando con facetas
+# Diagrama de cajas agrupando con facetas.
 
 ```{r}
 # Diagrama de cajas agrupando con facetas la popularidad de los artistas y la popularidad de las canciones
 ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_boxplot() + facet_wrap(~ range_popularity) + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable")
 ```
 
-# Diagrama de cajas agrupando con facetas y ordenando
+# Diagrama de cajas agrupando con facetas y ordenando.
 
 ```{r}
 # Diagrama de cajas agrupando con facetas y ordenando la popularidad de los artistas y la popularidad de las canciones
 ggplot(df_long, aes(x = variable, y = value, fill = variable)) + geom_boxplot() + facet_wrap(~ range_popularity, scales = "free_x") + labs(title = "Popularidad de los artistas y de las canciones", x = "Popularidad", y = "Cantidad", fill = "Variable") + scale_x_discrete(limits = c("range_popularity", "popularity", "followers"))
 ```
 
-# Comparar la distribucion observada de una variable cuantitativa discreta con sus distribuciones teoricas apartir de sus percentiles
+# Comparar la distribucion observada de una variable cuantitativa discreta con su distribución teórica a partir de sus percentiles.
 
 ```{r}
 # Comparar la distribucion observada de la popularidad de los artistas con sus distribuciones teoricas apartir de sus percentiles
 qqnorm(df$popularity, main = "Popularidad de los artistas", xlab = "Percentiles teoricos", ylab = "Percentiles observados")
 qqline(df$popularity, col = "red")
+```
 
+# Comparar la distribucion observada de una variable cuantitativa continua con su distribución teórica a partir de sus percentiles.
+
+```{r}	
 # Comparar la distribucion observada de la duracion de las canciones con sus distribuciones teoricas apartir de sus percentiles
 qqnorm(df$duration_ms, main = "Duracion de las canciones", xlab = "Percentiles teoricos", ylab = "Percentiles observados")
 qqline(df$duration_ms, col = "green")
 ```
 
-# Programar una funcion para calcular el coeficiente de correlacion de Pearson
+# Programar funciones para automatizar el análisis de datos.
 
 ```{r}
+# Programar una funcion para calcular la media, la varianza y la desviacion estandar de una variable cuantitativa discreta
+medidas_resumen_discreta <- function(x) {
+  n <- length(x)
+  media <- sum(x) / n
+  varianza <- sum((x - media)^2) / (n - 1)
+  desviacion_estandar <- sqrt(varianza)
+  medidas_resumen <- c(media, varianza, desviacion_estandar)
+  return(medidas_resumen)
+}
+# Calcular la media, la varianza y la desviacion estandar de la popularidad de los artistas
+medidas_resumen_discreta(df$popularity)
+
 # Programar una funcion para calcular el coeficiente de correlacion de Pearson
 coeficiente_correlacion_pearson <- function(x, y) {
   n <- length(x)
@@ -491,14 +517,10 @@ coeficiente_correlacion_pearson <- function(x, y) {
   r <- numerador / denominador
   return(r)
 }
-
 # Calcular el coeficiente de correlacion de Pearson entre la popularidad de los artistas y la popularidad de las canciones
 coeficiente_correlacion_pearson(df$popularity, df$followers)
-```
 
-# Programar una funcion para calcular el coeficiente de correlacion de Spearman
 
-```{r}
 # Programar una funcion para calcular el coeficiente de correlacion de Spearman
 coeficiente_correlacion_spearman <- function(x, y) {
   n <- length(x)
@@ -507,7 +529,6 @@ coeficiente_correlacion_spearman <- function(x, y) {
   r <- 1 - (6 * numerador / denominador)
   return(r)
 }
-
 # Calcular el coeficiente de correlacion de Spearman entre la popularidad de los artistas y la popularidad de las canciones
 coeficiente_correlacion_spearman(df$popularity, df$followers)
 ```
